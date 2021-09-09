@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630018624474.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "408CC2B7",
+    "lastKnownWriteTime" : 1630019298,
+    "last_content_update" : 1630019298973,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/230_traintest.r",
+    "project_path" : "src/rpart/230_traintest.r",
+    "properties" : {
+        "cursorPosition" : "13,19",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

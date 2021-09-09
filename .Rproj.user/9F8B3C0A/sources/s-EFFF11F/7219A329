@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630019886804.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7219A329",
+    "lastKnownWriteTime" : 1630023853,
+    "last_content_update" : 1630023853942,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/231_traintest_estratificado.r",
+    "project_path" : "src/rpart/231_traintest_estratificado.r",
+    "properties" : {
+        "cursorPosition" : "22,7",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

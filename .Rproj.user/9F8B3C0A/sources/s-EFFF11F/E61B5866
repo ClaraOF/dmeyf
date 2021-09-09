@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630017290167.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3122720470",
+    "id" : "E61B5866",
+    "lastKnownWriteTime" : 1630019305,
+    "last_content_update" : 1630019305573,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/210_ingenuo.r",
+    "project_path" : "src/rpart/210_ingenuo.r",
+    "properties" : {
+        "cursorPosition" : "8,6",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

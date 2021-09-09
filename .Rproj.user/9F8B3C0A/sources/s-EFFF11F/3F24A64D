@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630025032380.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3128131278",
+    "id" : "3F24A64D",
+    "lastKnownWriteTime" : 1630026678,
+    "last_content_update" : 1630026678943,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/241_crossvalidation.r",
+    "project_path" : "src/rpart/241_crossvalidation.r",
+    "properties" : {
+        "cursorPosition" : "36,74",
+        "scrollLine" : "23"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

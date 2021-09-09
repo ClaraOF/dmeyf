@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630023880927.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3232621330",
+    "id" : "714EDD38",
+    "lastKnownWriteTime" : 1630025130,
+    "last_content_update" : 1630025130532,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/240_montecarlo.r",
+    "project_path" : "src/rpart/240_montecarlo.r",
+    "properties" : {
+        "cursorPosition" : "78,31",
+        "scrollLine" : "61"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1630018525260.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1748165474",
+    "id" : "6575CDE9",
+    "lastKnownWriteTime" : 1630019302,
+    "last_content_update" : 1630019302825,
+    "path" : "~/Maestria/DM_EyF/dmeyf/src/rpart/220_arbol_aplicar.r",
+    "project_path" : "src/rpart/220_arbol_aplicar.r",
+    "properties" : {
+        "cursorPosition" : "13,27",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
