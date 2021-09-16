@@ -19,7 +19,7 @@ require("mlrMBO")
 
 
 #defino la carpeta donde trabajo
-setwd( "~/buckets/b1/crudoB/"  )
+setwd( "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF" )
 
 
 kexperimento  <- NA   #NA si se corre la primera vez, un valor concreto si es para continuar procesando
@@ -145,7 +145,7 @@ ArbolesAzarosos_CrossValidation  <- function( data, param, pcampos_buenos, qfold
                           seq(qfolds), # 1 2 3 4 5  
                           MoreArgs= list( data, param, pcampos_buenos), 
                           SIMPLIFY= FALSE,
-                          mc.cores= 5 )   #se puede subir a 5 si posee Linux o Mac OS
+                          mc.cores= 1 )   #se puede subir a 5 si posee Linux o Mac OS
                                           #Se se usa Windows, obligatoriamente debe ser  1
 
   data[ , fold := NULL ]

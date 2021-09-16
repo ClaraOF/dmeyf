@@ -25,10 +25,16 @@ setwd( "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF" )
 
 kexperimento  <- NA   #NA si se corre la primera vez, un valor concreto si es para continuar procesando
 
-kscript           <- "560_ranger_BO"
+kscript           <- "560_ranger_BO_Clara"
 karch_generacion  <- "./datasetsOri/paquete_premium_202009.csv"
 karch_aplicacion  <- "./datasetsOri/paquete_premium_202011.csv"
 kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
+
+param  <- list( "num.trees"=      500,  #cantidad de arboles
+                "mtry"=             sqrt(ncol(dtrain)),  #cantidad de variables que evalua para hacer un split
+                "min.node.size"=    1,  #hoja mas chica
+                "max.depth"=        0   # 0 significa profundidad infinita
+              )
 
 hs  <- makeParamSet(
           makeIntegerParam("num.trees" ,        lower=  2L  , upper=  200L),  #la letra L al final significa ENTERO
@@ -38,46 +44,9 @@ hs  <- makeParamSet(
 
 ksemilla_azar  <- 999979  #Aqui poner la propia semilla
 #------------------------------------------------------------------------------
-#Funcion que lleva el registro de los experimentos
 
-get_experimento  <- function()
-{
-  if( !file.exists( "./maestro.yaml" ) )  cat( file="./maestro.yaml", "experimento: 1000" )
-
-  exp  <- read_yaml( "./maestro.yaml" )
-  experimento_actual  <- exp$experimento
-
-  exp$experimento  <- as.integer(exp$experimento + 1)
-  Sys.chmod( "./maestro.yaml", mode = "0644", use_umask = TRUE)
-  write_yaml( exp, "./maestro.yaml" )
-  Sys.chmod( "./maestro.yaml", mode = "0444", use_umask = TRUE) #dejo el archivo readonly
-
-  return( experimento_actual )
-}
 #------------------------------------------------------------------------------
-#graba a un archivo los componentes de lista
-#para el primer registro, escribe antes los titulos
 
-loguear  <- function( reg, arch=NA, folder="./work/", ext=".txt", verbose=TRUE )
-{
-  archivo  <- arch
-  if( is.na(arch) )  archivo  <- paste0(  folder, substitute( reg), ext )
-
-  if( !file.exists( archivo ) )  #Escribo los titulos
-  {
-    linea  <- paste0( "fecha\t", 
-                      paste( names(reg), collapse="\t" ), "\n" )
-
-    cat( linea, file=archivo )
-  }
-
-  linea  <- paste0( format(Sys.time(), "%Y%m%d %H%M%S"),  "\t",     #la fecha y hora
-                    gsub( ", ", "\t", toString( reg ) ),  "\n" )
-
-  cat( linea, file=archivo, append=TRUE )  #grabo al archivo
-
-  if( verbose )  cat( linea )   #imprimo por pantalla
-}
 #------------------------------------------------------------------------------
 #funcion para particionar, es la que Andres reemplaza con caret
 
@@ -138,7 +107,6 @@ ranger_CrossValidation  <- function( data, param, pcampos_buenos, qfolds, pagrup
 
 EstimarGanancia_ranger  <- function( x )
 {
-   GLOBAL_iteracion  <<-  GLOBAL_iteracion + 1
 
    xval_folds  <- 5
    ganancia  <- ranger_CrossValidation( dataset, 
@@ -147,10 +115,7 @@ EstimarGanancia_ranger  <- function( x )
                                         pagrupa= "clase_binaria", 
                                         semilla= ksemilla_azar )
 
-   #si tengo una ganancia superadora, genero el archivo para Kaggle
-   if(  ganancia > GLOBAL_ganancia_max )
-   {
-     GLOBAL_ganancia_max  <<- ganancia  #asigno la nueva maxima ganancia
+   #genero el archivo para Kaggle
 
      set.seed(ksemilla_azar)
 
@@ -172,39 +137,14 @@ EstimarGanancia_ranger  <- function( x )
 
      #genero el archivo para Kaggle
      fwrite( entrega, 
-             file= paste0(kkaggle, GLOBAL_iteracion, ".csv" ),
+             file= paste0(kkaggle, ".csv" ),
              sep=  "," )
-   }
-
-   #logueo 
-   xx  <- x
-   xx$xval_folds  <-  xval_folds
-   xx$ganancia  <- ganancia
-   loguear( xx,  arch= klog )
-
+   print(ganancia)
 
    return( ganancia )
 }
 #------------------------------------------------------------------------------
 #Aqui empieza el programa
-
-if( is.na(kexperimento ) )   kexperimento <- get_experimento()  #creo el experimento
-
-#en estos archivos quedan los resultados
-kbayesiana  <- paste0("./work/E",  kexperimento, "_rpart.RDATA" )
-klog        <- paste0("./work/E",  kexperimento, "_rpart_log.txt" )
-kkaggle     <- paste0("./kaggle/E",kexperimento, "_", kscript, "_" )
-
-
-GLOBAL_ganancia_max  <-  -Inf
-GLOBAL_iteracion  <- 0
-
-if( file.exists(klog) )
-{
- tabla_log  <- fread( klog)
- GLOBAL_iteracion  <- nrow( tabla_log ) -1
- GLOBAL_ganancia_max  <-  tabla_log[ , max(ganancia) ]
-}
 
 
 #cargo el datset donde voy a entrenar
