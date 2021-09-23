@@ -28,7 +28,7 @@ require("mlrMBO")
 #para poder usarlo en la PC y en la nube sin tener que cambiar la ruta
 #cambiar aqui las rutas en su maquina
 switch ( Sys.info()[['sysname']],
-         Windows = { directory.root  <-  "M:\\" },   #Windows
+         Windows = { directory.root  <- "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF"},   #Windows
          Darwin  = { directory.root  <-  "~/dm/" },  #Apple MAC
          Linux   = { directory.root  <-  "~/buckets/b1/" } #Google Cloud
        )
@@ -40,8 +40,10 @@ setwd( directory.root )
 kexperimento  <- NA   #NA si se corre la primera vez, un valor concreto si es para continuar procesando
 
 kscript           <- "672_lgb_binaria2"
-karch_generacion  <- "./datasetsOri/paquete_premium_202009.csv"
-karch_aplicacion  <- "./datasetsOri/paquete_premium_202011.csv"
+#karch_generacion  <- "./datasetsOri/paquete_premium_202009.csv"
+#karch_aplicacion  <- "./datasetsOri/paquete_premium_202011.csv"
+karch_generacion  <- "./datasets/paquete_premium_202009_ext.csv"
+karch_aplicacion  <- "./datasets/paquete_premium_202011_ext.csv"
 kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
 
 #Aqui se cargan los hiperparametros
@@ -53,9 +55,10 @@ hs <- makeParamSet(
          makeNumericParam("prob_corte",       lower= 0.020, upper=    0.055)
         )
 
-campos_malos  <- c( "ccajas_transacciones", "Master_mpagominimo" )   #aqui se deben cargar todos los campos culpables del Data Drifting
+#campos_malos  <- c( "ccajas_transacciones", "Master_mpagominimo" )   #aqui se deben cargar todos los campos culpables del Data Drifting
+campos_malos  <- c("ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares")
 
-ksemilla_azar  <- 102191  #Aqui poner la propia semilla
+ksemilla_azar  <- 999979  #Aqui poner la propia semilla
 #------------------------------------------------------------------------------
 #Funcion que lleva el registro de los experimentos
 
@@ -85,7 +88,7 @@ loguear  <- function( reg, arch=NA, folder="./work/", ext=".txt", verbose=TRUE )
   if( !file.exists( archivo ) )  #Escribo los titulos
   {
     linea  <- paste0( "fecha\t", 
-                      paste( list.names(reg), collapse="\t" ), "\n" )
+                      paste( names(reg), collapse="\t" ), "\n" )
 
     cat( linea, file=archivo )
   }
