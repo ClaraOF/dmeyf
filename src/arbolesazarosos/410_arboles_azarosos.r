@@ -19,12 +19,12 @@ dapply  <- fread("./datasetsOri/paquete_premium_202011.csv")
 
 #Establezco cuales son los campos que puedo usar para la prediccion
 #campos_buenos  <- setdiff(  colnames(dtrain) ,  c("clase_ternaria") )
-campos_buenos  <- setdiff(  colnames(dtrain) ,  c("clase_ternaria","internet","tpaquete1" ,"mcaja_ahorro_dolares" ,"mcajeros_propios_descuentos" ,"mtarjeta_visa_descuentos" ,"ctarjeta_master_descuentos" ,"cmobile_app_trx" ,"Master_madelantodolares") )
+campos_buenos  <- setdiff(  colnames(dtrain) ,  c("clase_ternaria"))#,"internet","tpaquete1" ,"mcaja_ahorro_dolares" ,"mcajeros_propios_descuentos" ,"mtarjeta_visa_descuentos" ,"ctarjeta_master_descuentos" ,"cmobile_app_trx" ,"Master_madelantodolares") )
 
 
-parametros  <-  list( "cp"=-0.170080394896704, "minsplit"=2019,  "minbucket"=381, "maxdepth"=15)
+parametros  <-  list( "cp"=-0.668285152166367, "minsplit"=1310,  "minbucket"=240, "maxdepth"=11)
 
-num_trees         <-  100    #voy a generar 10 arboles
+num_trees         <-  500    #voy a generar 10 arboles
 feature_fraction  <-   0.5  #entreno cada arbol con solo 50% de las variables variables
 
 set.seed(999979) #Establezco la semilla aleatoria
@@ -67,5 +67,5 @@ entrega  <- as.data.table( list( "numero_de_cliente"= dapply[  , numero_de_clien
 
 #genero el archivo para Kaggle
 fwrite( entrega, 
-        file="./kaggle/arboles_azarosos_001_B4.csv", 
+        file="./kaggle/arboles_azarosos_001_B7.csv", 
         sep="," )

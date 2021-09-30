@@ -22,10 +22,11 @@ dataset[ , clase01:= ifelse( clase_ternaria=="CONTINUA", 0, 1 ) ]
 #Quito el Data Drifting de  "ccajas_transacciones"  "Master_mpagominimo"
 campos_buenos  <- setdiff( colnames(dataset),
                           # c("clase_ternaria", "clase01", "ccajas_transacciones"))#, "Master_mpagominimo" ) )
-                         # c("clase_ternaria", "clase01","ccajas_transacciones" ,"internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
-                         #  c("clase_ternaria", "clase01"))
-                         #saco parametros mas importantes:
-                          c("clase_ternaria", "clase01", "ccajas_transacciones","ctrx_quarter"))
+                         #SACO SOLO MIS VARIABLES DE DATA DRIFT:
+                         #c("clase_ternaria", "clase01","ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
+                         #vOY SACANDO LA PRIMERA QUE VA SALEINDO MAS IMPROTANTE LUEGO DE CADA EJECUCION:
+                         c("ctrx_quarter","clase_ternaria", "clase01","ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
+                       # 
 #genero el formato requerido por LightGBM
 dtrain  <- lgb.Dataset( data=  data.matrix(  dataset[ , campos_buenos, with=FALSE]),
                         label= dataset[ , clase01]
@@ -42,7 +43,7 @@ modelo  <- lightgbm( data= dtrain,
 
 tb_importancia  <- lgb.importance( model= modelo )
 fwrite( tb_importancia, 
-        file= paste0("./work/", "Parametros_imp.txt"),
+        file= paste0("./work/", "Parametros_imp_v2.txt"),
         sep="\t" )
 #cargo el dataset donde aplico el modelo
 #dapply  <- fread("./datasetsOri/paquete_premium_202011.csv")

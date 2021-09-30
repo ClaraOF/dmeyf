@@ -6,16 +6,18 @@ require("data.table")
 
 
 #Aqui comienza el programa
-setwd("~/buckets/b1/crudoB/")
+setwd("C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF")
 
-datasetA  <- fread( "./datasetsOri/paquete_premium_202009.csv" )
-datasetB  <- fread( "./datasetsOri/paquete_premium_202011.csv" )
+#datasetA  <- fread( "./datasetsOri/paquete_premium_202009.csv" )
+#datasetB  <- fread( "./datasetsOri/paquete_premium_202011.csv" )
+datasetA  <- fread("./datasets/paquete_premium_202009_most_important_features_ratio.csv" )
+datasetB  <- fread( "./datasets/paquete_premium_202011_most_important_features_ratio.csv" )
 
 
 campos_buenos  <- setdiff(  colnames( datasetA),  c("numero_de_cliente","foto_mes","clase_ternaria" ) )
 
 
-pdf("./work/densidades_01.pdf")
+pdf("./work/densidades_new.pdf")
 for( campo in  campos_buenos )
 {
   cat( campo, "  " )
