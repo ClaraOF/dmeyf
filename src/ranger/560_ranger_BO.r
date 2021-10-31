@@ -30,11 +30,16 @@ karch_generacion  <- "./datasetsOri/paquete_premium_202009.csv"
 karch_aplicacion  <- "./datasetsOri/paquete_premium_202011.csv"
 kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
 
+#hs  <- makeParamSet(
+ #         makeIntegerParam("num.trees" ,        lower=  2L  , upper=  200L),  #la letra L al final significa ENTERO
+  #        makeIntegerParam("max.depth",         lower=  0L  , upper=   20L),  # 0 significa profundidad infinita
+  #        makeIntegerParam("min.node.size" ,    lower=  1L  , upper=  200L),
+  #        makeIntegerParam("mtry" ,             lower=  2L  , upper=   20L))
 hs  <- makeParamSet(
-          makeIntegerParam("num.trees" ,        lower=  2L  , upper=  200L),  #la letra L al final significa ENTERO
-          makeIntegerParam("max.depth",         lower=  0L  , upper=   20L),  # 0 significa profundidad infinita
-          makeIntegerParam("min.node.size" ,    lower=  1L  , upper=  200L),
-          makeIntegerParam("mtry" ,             lower=  2L  , upper=   20L))
+  makeIntegerParam("num.trees" ,        lower=  200L  , upper=  200L),  #la letra L al final significa ENTERO
+  makeIntegerParam("max.depth",         lower=  17L  , upper=   17L),  # 0 significa profundidad infinita
+  makeIntegerParam("min.node.size" ,    lower=  184L  , upper=  184L),
+  makeIntegerParam("mtry" ,             lower=  6L  , upper=   6L))
 
 ksemilla_azar  <- 999979  #Aqui poner la propia semilla
 #------------------------------------------------------------------------------

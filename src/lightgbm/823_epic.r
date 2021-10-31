@@ -33,7 +33,7 @@ require("mlrMBO")
 #para poder usarlo en la PC y en la nube sin tener que cambiar la ruta
 #cambiar aqui las rutas en su maquina
 switch ( Sys.info()[['sysname']],
-         Windows = { directory.root  <-  "M:\\" },   #Windows
+         Windows = { directory.root  <-  "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF" },   #Windows
          Darwin  = { directory.root  <-  "~/dm/" },  #Apple MAC
          Linux   = { directory.root  <-  "~/buckets/b1/" } #Google Cloud
        )
@@ -46,7 +46,7 @@ kexperimento  <- NA   #NA si se corre la primera vez, un valor concreto si es pa
 
 kscript         <- "823_epic"
 
-karch_dataset    <- "./datasets/dataset_epic_simple_v007.csv.gz"   #este dataset se genero en el script 812_dataset_epic.r
+karch_dataset    <- "./datasets/dataset_epic_simple_v009.csv.gz"   #este dataset se genero en el script 812_dataset_epic.r
 
 kapply_mes       <- c(202011)  #El mes donde debo aplicar el modelo
 
@@ -61,19 +61,51 @@ kgen_mes_hasta    <- 202009  #Obviamente, solo puedo entrenar hasta 202011
 kgen_mes_desde    <- 202009
 
 
-kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
+#kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
+kBO_iter    <-  200 
 
 #Aqui se cargan los hiperparametros
+#hs <- makeParamSet( 
+#          makeNumericParam("learning_rate",    lower=    0.02 , upper=    0.1),
+#          makeNumericParam("feature_fraction", lower=    0.1  , upper=    1.0),
+#          makeIntegerParam("min_data_in_leaf", lower=  100L   , upper= 8000L),
+#          makeIntegerParam("num_leaves",       lower=    8L   , upper= 1024L)
+#         )
+
+#hs <- makeParamSet( 
+#  makeNumericParam("learning_rate",    lower=    0.02 , upper=    0.43),
+#  makeNumericParam("feature_fraction", lower=    0.2  , upper=    1.0),
+#  makeIntegerParam("min_data_in_leaf", lower=  1440L   , upper= 8000L),
+#  makeIntegerParam("num_leaves",       lower=    16L   , upper= 1024L)
+#)
+#hs <- makeParamSet( 
+#  makeNumericParam("learning_rate",    lower=    0.010 , upper=    0.041),
+#  makeNumericParam("feature_fraction", lower=    0.35  , upper=    0.82),
+#  makeIntegerParam("min_data_in_leaf", lower=  1999L   , upper= 8000L),
+#  makeIntegerParam("max_depth",       lower=    3L   , upper= 12L),
+#  makeIntegerParam("num_leaves",       lower=    200L   , upper= 1024L),
+#  makeIntegerParam("min_gain_to_split", lower=    0.0   , upper= 15),
+#  makeIntegerParam("lambda_l1", lower=    0.0   , upper= 100),
+#  makeIntegerParam("lambda_l2", lower=    0.0   , upper= 100)
+  #makeIntegerParam("max_bin", lower=    1L   , upper= 10L) #esto tira error [LightGBM] [Fatal] Cannot change max_bin after constructed Dataset handle.
+  #https://stackoverflow.com/questions/66317733/error-in-dataupdate-paramsparams-params-lightgbm-fatal-cannot-change
+  
+#)
+
 hs <- makeParamSet( 
-         makeNumericParam("learning_rate",    lower=    0.02 , upper=    0.1),
-         makeNumericParam("feature_fraction", lower=    0.1  , upper=    1.0),
-         makeIntegerParam("min_data_in_leaf", lower=  100L   , upper= 8000L),
-         makeIntegerParam("num_leaves",       lower=    8L   , upper= 1024L)
-        )
+          makeNumericParam("learning_rate",    lower=    0.02 , upper=    0.1),
+          makeNumericParam("feature_fraction", lower=    0.1  , upper=    1.0),
+          makeIntegerParam("min_data_in_leaf", lower=  4L   , upper= 100L),
+          makeIntegerParam("num_leaves",       lower=    4L   , upper= 100L),
+          makeIntegerParam("min_gain_to_split", lower=    0.0   , upper= 150),
+          makeIntegerParam("lambda_l1", lower=    0.0   , upper= 20),
+          makeIntegerParam("lambda_l2", lower=    0.0   , upper= 200),
+          makeIntegerParam("max_bin", lower=    31L   , upper= 1023L) 
+         )
 
-campos_malos  <- c()   #aqui se deben cargar todos los campos culpables del Data Drifting
+campos_malos  <- c("ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares")   #aqui se deben cargar todos los campos culpables del Data Drifting
 
-ksemilla_azar  <- 102191  #Aqui poner la propia semilla
+ksemilla_azar  <- 999979  #Aqui poner la propia semilla
 #------------------------------------------------------------------------------
 #Funcion que lleva el registro de los experimentos
 
@@ -103,7 +135,7 @@ loguear  <- function( reg, arch=NA, folder="./work/", ext=".txt", verbose=TRUE )
   if( !file.exists( archivo ) )  #Escribo los titulos
   {
     linea  <- paste0( "fecha\t", 
-                      paste( list.names(reg), collapse="\t" ), "\n" )
+                      paste( names(reg), collapse="\t" ), "\n" )
 
     cat( linea, file=archivo )
   }
@@ -162,7 +194,7 @@ HemiModelos  <- function( hparam )
                               param= hparam,
                               verbose= -100
                             )
- 
+
   rm( dgeneracion2 )  #borro y libero memoria
   gc()
 
@@ -288,6 +320,53 @@ EstimarGanancia_lightgbm  <- function( x )
 
   gc()
 
+  #param_basicos  <- list( objective= "binary",
+  #                        metric= "custom",
+  #                        first_metric_only= TRUE,
+  #                        boost_from_average= TRUE,
+  #                        feature_pre_filter= FALSE,
+  #                        verbosity= -100,
+  #                        seed= 999983,
+  #                        max_depth=  -1,         # -1 significa no limitar,  por ahora lo dejo fijo
+  #                        min_gain_to_split= 0.0, #por ahora, lo dejo fijo
+  #                        lambda_l1= 0.0,         #por ahora, lo dejo fijo
+  #                        lambda_l2= 0.0,         #por ahora, lo dejo fijo
+                          #max_bin= 31,            #por ahora, lo dejo fijo
+  #                        max_bin= 5,            #lo pongo en 5 como el script con_los_economistas_no
+  #                        num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
+  #                        force_row_wise= TRUE    #para que los alumnos no se atemoricen con tantos warning
+  #                      )
+  #param_basicos  <- list( objective= "binary",
+  #                        metric= "custom",
+  #                        first_metric_only= TRUE,
+  #                        boost_from_average= TRUE,
+  #                        feature_pre_filter= FALSE,
+   #                       verbosity= -100,
+  #                        seed= 999979,
+  #                        max_bin= 5,
+  #                        num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
+  #                        force_row_wise= TRUE    #para que los alumnos no se atemoricen con tantos warning
+  #)
+#para ejecutarlo como RF
+  #param_basicos  <- list( objective= "binary",
+  #                        metric= "custom",
+  #                        boosting_type = 'rf',
+  ##                        bagging_fraction=0.632,
+  #                        bagging_freq =1,
+  #                        first_metric_only= TRUE,
+  #                        boost_from_average= TRUE,
+  #                        feature_pre_filter= FALSE,
+  #                        verbosity= -100,
+  #                        seed= 999983,
+  #                        max_depth=  -1,         # -1 significa no limitar,  por ahora lo dejo fijo
+                          #min_gain_to_split= 0.0, #por ahora, lo dejo fijo
+                          #lambda_l1= 0.0,         #por ahora, lo dejo fijo
+                          #lambda_l2= 20,         #por ahora, lo dejo fijo
+  #                       #max_bin= 40,            #por ahora, lo dejo fijo
+  #                        #max_bin= 55,            #lo pongo en 5 como el script con_los_economistas_no
+  #                        num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
+  #                        force_row_wise= TRUE    #para que los alumnos no se atemoricen con tantos warning
+   #                     )
   param_basicos  <- list( objective= "binary",
                           metric= "custom",
                           first_metric_only= TRUE,
@@ -296,14 +375,22 @@ EstimarGanancia_lightgbm  <- function( x )
                           verbosity= -100,
                           seed= 999983,
                           max_depth=  -1,         # -1 significa no limitar,  por ahora lo dejo fijo
-                          min_gain_to_split= 0.0, #por ahora, lo dejo fijo
-                          lambda_l1= 0.0,         #por ahora, lo dejo fijo
-                          lambda_l2= 0.0,         #por ahora, lo dejo fijo
-                          max_bin= 31,            #por ahora, lo dejo fijo
+                          #min_gain_to_split= 0.0, #por ahora, lo dejo fijo
+                          #lambda_l1= 0.0,         #por ahora, lo dejo fijo
+                          #lambda_l2= 20,         #por ahora, lo dejo fijo
+                          #                       #max_bin= 40,            #por ahora, lo dejo fijo
+                          #max_bin= 55,            #lo pongo en 5 como el script con_los_economistas_no
                           num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
                           force_row_wise= TRUE    #para que los alumnos no se atemoricen con tantos warning
+  )
+  #agrego esto para poder poner a max_-bin como hiperparametro
+  dtrain  <- lgb.Dataset( data=    data.matrix(  dataset[ entrenamiento==1 , campos_buenos, with=FALSE]),
+                          label=   dataset[ entrenamiento==1, clase01],
+                          weight=  dataset[ entrenamiento==1, ifelse(clase_ternaria=="CONTINUA", 1/ktrain_subsampling,
+                                                                     ifelse( clase_ternaria=="BAJA+2", 1, 1.0000001))] ,
+                          free_raw_data= TRUE
                         )
-
+  gc()
   #el parametro discolo, que depende de otro
   param_variable  <- list(  early_stopping_rounds= as.integer(50 + 1/x$learning_rate) )
 
@@ -479,6 +566,6 @@ system( "sleep 10  &&  sudo shutdown -h now", wait=FALSE)
 #        wait=FALSE )
 
 
-quit( save="no" )
+#quit( save="no" )
 
 

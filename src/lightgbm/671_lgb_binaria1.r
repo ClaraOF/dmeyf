@@ -48,13 +48,20 @@ karch_aplicacion  <- "./datasets/paquete_premium_202011_ext.csv"
 kBO_iter    <-  150   #cantidad de iteraciones de la Optimizacion Bayesiana
 
 #Aqui se cargan los hiperparametros
+#hs <- makeParamSet( 
+ #        makeNumericParam("learning_rate",    lower= 0.01 , upper=    0.1),
+  #       makeNumericParam("feature_fraction", lower= 0.2  , upper=    1.0),
+   #      makeIntegerParam("min_data_in_leaf", lower= 0    , upper= 8000),
+    #     makeIntegerParam("num_leaves",       lower=16L   , upper= 1024L),
+     #    makeNumericParam("prob_corte",       lower= 0.02499, upper=    0.02501)
+      #  )
 hs <- makeParamSet( 
-         makeNumericParam("learning_rate",    lower= 0.01 , upper=    0.1),
-         makeNumericParam("feature_fraction", lower= 0.2  , upper=    1.0),
-         makeIntegerParam("min_data_in_leaf", lower= 0    , upper= 8000),
-         makeIntegerParam("num_leaves",       lower=16L   , upper= 1024L),
-         makeNumericParam("prob_corte",       lower= 0.02499, upper=    0.02501)
-        )
+  makeNumericParam("learning_rate",    lower= 0.01 , upper=    0.017),
+  makeNumericParam("feature_fraction", lower= 0.2  , upper=    1.0),
+  makeIntegerParam("min_data_in_leaf", lower= 1000   , upper= 8000),
+  makeIntegerParam("num_leaves",       lower=156L   , upper= 1024L),
+  makeNumericParam("prob_corte",       lower= 0.042, upper=    0.047)
+)
 
 #campos_malos  <- c( "ccajas_transacciones", "Master_mpagominimo" )   #aqui se deben cargar todos los campos culpables del Data Drifting
 campos_malos  <- c("ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares")

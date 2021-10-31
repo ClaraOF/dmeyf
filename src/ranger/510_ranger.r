@@ -37,9 +37,9 @@ param  <- list( "num.trees"=      500,  #cantidad de arboles
                 "max.depth"=        0   # 0 significa profundidad infinita
               )
 
-set.seed(102191) #Establezco la semilla aleatoria
+set.seed(999979) #Establezco la semilla aleatoria
 
-modelo  <- ranger( formula= "clase_binaria ~ .",
+modelo  <- ranger( formula= "clase_binaria ~ . -internet -tpaquete1 -mcaja_ahorro_dolares -mcajeros_propios_descuentos -mtarjeta_visa_descuentos -ctarjeta_master_descuentos -cmobile_app_trx -Master_madelantodolares", 
                    data=  dtrain, 
                    probability=   TRUE,  #para que devuelva las probabilidades
                    num.trees=     param$num.trees,
@@ -56,5 +56,5 @@ entrega  <- as.data.table( list( "numero_de_cliente"= dapply[  , numero_de_clien
 
 #genero el archivo para Kaggle
 fwrite( entrega, 
-        file="./kaggle/ranger_001.csv", 
+        file="./kaggle/ranger_002.csv", 
         sep="," )

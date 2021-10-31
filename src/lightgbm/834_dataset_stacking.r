@@ -10,12 +10,12 @@ gc()             #garbage collection
 
 require("data.table")
 
-setwd("~/buckets/b1/crudoB/" )
+setwd("C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF")
 
-version  <- "v001"  #cambiar cada vez, asi se tiene versionado del dataset
+version  <- "v008"  #cambiar cada vez, asi se tiene versionado del dataset
 
-dataset  <- fread( "./datasets/dataset_epic_simple_v007.csv.gz" )
-dataset  <- copy(  dataset[  , c("numero_de_cliente","foto_mes","clase_ternaria"),  with=FALSE] )
+dataset  <- fread( "./datasets/dataset_epic_simple_v009.csv.gz" )
+#dataset  <- copy(  dataset[  , c("numero_de_cliente","foto_mes","clase_ternaria"),  with=FALSE] )
 gc()
 
 

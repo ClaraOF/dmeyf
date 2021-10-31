@@ -18,14 +18,16 @@ require("lightgbm")
 
 
 #defino la carpeta donde trabajo
-directory.root  <-  "~/buckets/b1/"  #Google Cloud
+directory.root  <-  "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF"  #Google Cloud
 setwd( directory.root )
 
 palancas  <- list()  #variable con las palancas para activar/desactivar
 
-palancas$version  <- "v007"   #Muy importante, ir cambiando la version
+palancas$version  <- "v010"   #Muy importante, ir cambiando la version
 
-palancas$variablesdrift  <- c("ccajas_transacciones", "Master_mpagominimo" )   #aqui van las columnas que se quieren eliminar
+#palancas$variablesdrift  <- c("ccajas_transacciones", "Master_mpagominimo" )   #aqui van las columnas que se quieren eliminar
+#elimino mis variables de data drift
+palancas$variablesdrift  <- c("ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares")
 
 palancas$corregir <-  TRUE    # TRUE o FALSE
 
@@ -255,7 +257,7 @@ AgregarVariables  <- function( dataset )
   dataset[ , mv_mconsumototal        := rowSums( cbind( Master_mconsumototal,  Visa_mconsumototal) , na.rm=TRUE ) ]
   dataset[ , mv_cconsumos            := rowSums( cbind( Master_cconsumos,  Visa_cconsumos) , na.rm=TRUE ) ]
   dataset[ , mv_cadelantosefectivo   := rowSums( cbind( Master_cadelantosefectivo,  Visa_cadelantosefectivo) , na.rm=TRUE ) ]
-  dataset[ , mv_mpagominimo          := rowSums( cbind( Master_mpagominimo,  Visa_mpagominimo) , na.rm=TRUE ) ]
+  #dataset[ , mv_mpagominimo          := rowSums( cbind( Master_mpagominimo,  Visa_mpagominimo) , na.rm=TRUE ) ]
 
   #a partir de aqui juego con la suma de Mastercard y Visa
   dataset[ , mvr_Master_mlimitecompra:= Master_mlimitecompra / mv_mlimitecompra ]
@@ -273,7 +275,7 @@ AgregarVariables  <- function( dataset )
   dataset[ , mvr_mpagospesos         := mv_mpagospesos / mv_mlimitecompra ]
   dataset[ , mvr_mpagosdolares       := mv_mpagosdolares / mv_mlimitecompra ]
   dataset[ , mvr_mconsumototal       := mv_mconsumototal  / mv_mlimitecompra ]
-  dataset[ , mvr_mpagominimo         := mv_mpagominimo  / mv_mlimitecompra ]
+  #dataset[ , mvr_mpagominimo         := mv_mpagominimo  / mv_mlimitecompra ]
 
   #Aqui debe usted agregar sus propias nuevas variables
 
@@ -569,8 +571,12 @@ CanaritosImportancia  <- function( dataset )
 correr_todo  <- function( palancas )
 {
   #cargo el dataset ORIGINAL
-  dataset1  <- fread( "./datasetsOri/paquete_premium_202009.csv")
-  dataset2  <- fread( "./datasetsOri/paquete_premium_202011.csv")
+  #dataset1  <- fread( "./datasetsOri/paquete_premium_202009.csv")
+  #dataset2  <- fread( "./datasetsOri/paquete_premium_202011.csv")
+  
+  #cargo mi dataset con las variables de ratio
+  dataset1  <- fread( "./datasets/paquete_premium_202009_most_important_features_ratio_new.csv")
+  dataset2  <- fread( "./datasets/paquete_premium_202011_most_important_features_ratio_new.csv")
 
   dataset   <- rbind( dataset1, dataset2 )
   rm( dataset1, dataset2 )
@@ -586,7 +592,7 @@ correr_todo  <- function( palancas )
 
   if( palancas$corregir )  Corregir( dataset )  #esta linea debe ir DESPUES de  DummiesNA
 
-  if( palancas$nuevasvars )  AgregarVariables( dataset )
+ # if( palancas$nuevasvars )  AgregarVariables( dataset )
 
   cols_analiticas  <- setdiff( colnames(dataset),  c("numero_de_cliente","foto_mes","mes","clase_ternaria") )
 
@@ -632,6 +638,6 @@ correr_todo  <- function( palancas )
 correr_todo( palancas )
 
 
-quit( save="no" )
+#quit( save="no" )
 
 

@@ -25,7 +25,7 @@ campos_buenos  <- setdiff( colnames(dataset),
                          #SACO SOLO MIS VARIABLES DE DATA DRIFT:
                          #c("clase_ternaria", "clase01","ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
                          #vOY SACANDO LA PRIMERA QUE VA SALEINDO MAS IMPROTANTE LUEGO DE CADA EJECUCION:
-                         c("ctrx_quarter","clase_ternaria", "clase01","ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
+                         c("ctarjeta_debito_transacciones","mpasivos_margen","mcuentas_saldo","ctarjeta_visa_transacciones","mtarjeta_visa_consumo","mcaja_ahorro","mpayroll","cpayroll_trx","ctrx_quarter","clase_ternaria", "clase01","ccajas_transacciones","internet","tpaquete1", "mcaja_ahorro_dolares", "mcajeros_propios_descuento","mtarjeta_visa_descuentos","ctarjeta_master_descuentos","cmobile_app_trx", "Master_madelantodolares"))
                        # 
 #genero el formato requerido por LightGBM
 dtrain  <- lgb.Dataset( data=  data.matrix(  dataset[ , campos_buenos, with=FALSE]),
@@ -43,7 +43,7 @@ modelo  <- lightgbm( data= dtrain,
 
 tb_importancia  <- lgb.importance( model= modelo )
 fwrite( tb_importancia, 
-        file= paste0("./work/", "Parametros_imp_v2.txt"),
+        file= paste0("./work/", "Parametros_imp_v10.txt"),
         sep="\t" )
 #cargo el dataset donde aplico el modelo
 #dapply  <- fread("./datasetsOri/paquete_premium_202011.csv")
