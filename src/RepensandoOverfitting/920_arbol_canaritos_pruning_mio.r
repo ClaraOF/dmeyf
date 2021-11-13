@@ -18,8 +18,14 @@ setwd( directory.root )
 
 
 #cargo el dataset
-dtrain  <- fread( "./datasetsOri/paquete_premium_202011.csv")
-dapply  <- fread( "./datasetsOri/paquete_premium_202101.csv")
+#dtrain  <- fread( "./datasetsOri/paquete_premium_202011.csv")
+#dapply  <- fread( "./datasetsOri/paquete_premium_202101.csv")
+
+dtrain  <- fread("./datasets/dataset_epic_v952.csv.gz")
+kapply_mes <- c(202101)  #El mes donde debo aplicar el modelo
+#cargo los datos donde voy a aplicar el modelo
+dapply  <- copy( dtrain[  foto_mes %in% kapply_mes ] )
+
 
 #uso esta semilla para los canaritos
 set.seed(10219)
