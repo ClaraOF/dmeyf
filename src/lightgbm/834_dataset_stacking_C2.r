@@ -9,12 +9,23 @@ rm( list=ls() )  #remove all objects
 gc()             #garbage collection
 
 require("data.table")
+require("rlist")
+require("yaml")
 
-setwd("C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF")
+require("lightgbm")
 
 version  <- "v111"  #cambiar cada vez, asi se tiene versionado del dataset
 
-dataset  <- fread( "./Cosas_Cloud/datasets_dataset_epic_v952.csv.gz" )
+#para poder usarlo en la PC y en la nube sin tener que cambiar la ruta
+#cambiar aqui las rutas en su maquina
+switch ( Sys.info()[['sysname']],
+         Windows = { directory.root  <-  "M:\\" },   #Windows
+         Darwin  = { directory.root  <-  "~/dm/" },  #Apple MAC
+         Linux   = { directory.root  <-  "~/buckets/b1/" } #Google Cloud
+       )
+#defino la carpeta donde trabajo
+setwd( directory.root )
+dataset  <- fread( "./datasets/dataset_epic_v952.csv.gz" )
 #dataset  <- copy(  dataset[  , c("numero_de_cliente","foto_mes","clase_ternaria"),  with=FALSE] )
 gc()
 
@@ -22,10 +33,10 @@ gc()
 #leo TODOS los archivos que estan en la carpeta  modelitos
 #y hago el join con  dataset  <numero_de_cliente, foto_mes, clase_ternaria>
 
-archivos  <- list.files( pattern="modelitos.csv.gz", path="./Cosas_Cloud/Modelitos Cloud/" )
+archivos  <- list.files( pattern="modelitos.csv.gz", path="./Modelitos/" )
 for( archivo  in archivos )
 {
-  darchivo  <- fread( paste0("./Cosas_Cloud/Modelitos Cloud/", archivo ) )
+  darchivo  <- fread( paste0("./Modelitos/", archivo ) )
   dataset  <- merge( dataset, darchivo, by=c("numero_de_cliente","foto_mes") )
 }
 
