@@ -33,10 +33,10 @@ gc()
 #leo TODOS los archivos que estan en la carpeta  modelitos
 #y hago el join con  dataset  <numero_de_cliente, foto_mes, clase_ternaria>
 
-archivos  <- list.files( pattern="modelitos.csv.gz", path="./Modelitos/" )
+archivos  <- list.files( pattern="modelitos.csv.gz", path="./modelitos/" )
 for( archivo  in archivos )
 {
-  darchivo  <- fread( paste0("./Modelitos/", archivo ) )
+  darchivo  <- fread( paste0("./modelitos/", archivo ) )
   dataset  <- merge( dataset, darchivo, by=c("numero_de_cliente","foto_mes") )
 }
 

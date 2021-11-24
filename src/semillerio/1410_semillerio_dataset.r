@@ -147,6 +147,26 @@ Corregir  <- function( dataset )
   dataset[ foto_mes==202011,  tmobile_app  := NA ]
   dataset[ foto_mes==202012,  tmobile_app  := NA ]
   dataset[ foto_mes==202101,  tmobile_app  := NA ]
+  
+  #mis nuevas variables agregadas
+  campos_importantes <- c("cpayroll_trx","ctarjeta_visa_transacciones","ctrx_quarter","mcaja_ahorro","mcuenta_corriente","mcuentas_saldo",
+                          "mdescubierto_preacordado","mprestamos_personales","mtarjeta_visa_consumo","Visa_Finiciomora")
+  for (i in 1:length(campos_importantes)) {
+    col = campos_importantes[i]
+    for (j in 1:length(campos_importantes)){
+      col2=campos_importantes[j]
+      if (col != col2) {
+        col_name = paste0("multiplo_", col, "_", col2)
+        dataset[ , paste0(col_name) := get(col) * get(col2) ]
+  }}}
+  for (i in 1:length(campos_importantes)) {
+    col = campos_importantes[i]
+    for (j in 1:length(campos_importantes)){
+      col2=campos_importantes[j]
+      if (col != col2) {
+        col_name = paste0("dividido_", col, "_", col2)
+        dataset[ , paste0(col_name) := get(col) / get(col2) ]
+  }}}
 
 }
 #------------------------------------------------------------------------------
@@ -172,7 +192,7 @@ setcolorder( dataset, nuevo_orden )
 
 #Grabo el dataset
 fwrite( dataset,
-        paste0( "./datasets/semillerio_dataset_lag1.csv.gz" ),
+        paste0( "./datasets/semillerio_dataset.2_lag1.csv.gz" ),
         logical01 = TRUE,
         sep= "," )
 

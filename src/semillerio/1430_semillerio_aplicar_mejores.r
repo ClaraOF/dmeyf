@@ -120,6 +120,9 @@ for( semilla in  ksemillas)
   set.seed( semilla )
   modelo  <- lgb.train( data= dtrain,
                         param= param_buenos )
+  #agregado para guardar los mejores parametros:
+    #calculo la importancia de variables
+  tb_importancia  <- lgb.importance( model= modelo )
 
   #aplico el modelo a los datos nuevos
   prediccion  <- frank(  predict( modelo, 
@@ -142,6 +145,10 @@ for( semilla in  ksemillas)
     {
       entrega[ ,  Predicted := 0L ]
       entrega[ 1:corte,  Predicted := 1L ]  #me quedo con los primeros
+	  #genero archivo de mejores features:
+	  fwrite( tb_importancia, 
+          file= paste0( "./work/E", , ksalida, "_", isemilla,"_","mejores", ".txt"),
+          sep="\t" )
 
       #genero el archivo para Kaggle
       fwrite( entrega[ , c("numero_de_cliente","Predicted"), with=FALSE], 

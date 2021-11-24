@@ -35,7 +35,7 @@ require("mlrMBO")
 switch ( Sys.info()[['sysname']],
          Windows = { directory.root  <-  "C:\\Users\\Administrator\\Documents\\Maestria\\DM_EyF" },   #Windows
          Darwin  = { directory.root  <-  "~/dm/" },  #Apple MAC
-         Linux   = { directory.root  <-  "~/buckets/b1/crudoB/" } #Google Cloud
+         Linux   = { directory.root  <-  "~/buckets/b1/" } #Google Cloud
        )
 #defino la carpeta donde trabajo
 setwd( directory.root )
