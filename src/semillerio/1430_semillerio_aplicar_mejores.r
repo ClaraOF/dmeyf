@@ -3,41 +3,75 @@ rm( list=ls() )  #remove all objects
 gc()             #garbage collection
 
 require("data.table")
-require("lightgbm")
+require("rlist")
+require("yaml")
 require("primes")
 
+require("lightgbm")
 
 setwd("~/buckets/b1/")
 
-karch_dataset  <- "./datasets/semillerio_dataset.2_lag1.csv.gz"
+karch_dataset  <- "./datasets/dataset_epic_v952.11.csv.gz"
 ksalida  <- "semillerio" 
 
+kexperimento  <- NA
+kscript         <- "s1431"
 kcantidad_semillas  <- 200
 
 #ATENCION
 #aqui deben ir los mejores valores que salieron de la optimizacion bayesiana
 x  <- list()
-x$gleaf_size   <-  64.2829839889624
-x$gnum_leaves  <-  0.213255232521238
-x$learning_rate <- 0.183297776416863 
-x$feature_fraction <-  0.340663963197106
-x$num_iterations  <- 134
+x$gleaf_size   <-  30.7660650410282
+x$gnum_leaves  <-  0.778862539722238
+x$learning_rate <- 0.110306906884749
+x$feature_fraction <-  0.581076591968023
+x$max_bin  <- 134
+x$num_iterations  <- 138
+x$pos_ratio  <- 0.0416643652766271
 
+
+#------------------------------------------------------------------------------
+#Funcion que lleva el registro de los experimentos
+
+get_experimento  <- function()
+{
+  if( !file.exists( "./maestro.yaml" ) )  cat( file="./maestro.yaml", "experimento: 1000" )
+  
+  exp  <- read_yaml( "./maestro.yaml" )
+  experimento_actual  <- exp$experimento
+  
+  exp$experimento  <- as.integer(exp$experimento + 1)
+  Sys.chmod( "./maestro.yaml", mode = "0644", use_umask = TRUE)
+  write_yaml( exp, "./maestro.yaml" )
+  Sys.chmod( "./maestro.yaml", mode = "0444", use_umask = TRUE) #dejo el archivo readonly
+  
+  return( experimento_actual )
+}
 #------------------------------------------------------------------------------
 
 particionar  <- function( data,  division, agrupa="",  campo="fold", start=1, seed=NA )
 {
   if( !is.na(seed) )   set.seed( seed )
-
+  
   bloque  <- unlist( mapply(  function(x,y) { rep( y, x )} ,   division,  seq( from=start, length.out=length(division) )  ) )  
-
+  
   data[ ,  (campo) :=  sample( rep( bloque, ceiling(.N/length(bloque))) )[1:.N],
-            by= agrupa ]
+        by= agrupa ]
 }
 #------------------------------------------------------------------------------
 
 
 setwd("~/buckets/b1/")
+
+if( is.na(kexperimento ) )   kexperimento <- get_experimento()  #creo el experimento
+#en estos archivos quedan los resultados
+dir.create( paste0( "./work/E",  kexperimento, "/" ) )     #creo carpeta del experimento dentro de work
+dir.create( paste0( "./kaggle/E",  kexperimento, "/" ) )   #creo carpeta del experimento dentro de kaggle
+dir.create( paste0( "./kaggle/E",  kexperimento, "/meseta/" ) )   #creo carpeta del experimento dentro de kaggle
+
+kkaggle       <- paste0("./kaggle/E",kexperimento, "/E",  kexperimento, "_", kscript, "_" )
+kkagglemeseta <- paste0("./kaggle/E",kexperimento, "/meseta/E",  kexperimento, "_", kscript, "_" )
+
 
 set.seed( 102191 )   #dejo fija esta semilla
 
@@ -90,7 +124,7 @@ param_buenos  <- list( objective= "binary",
                        verbosity= -100,
                        seed= 484201,
                        max_depth=  -1,
-                       max_bin= 31,
+                       max_bin= x$max_bin,
                        min_gain_to_split= 0.0,
                        lambda_l1= 0.0,
                        lambda_l2= 0.0, 
@@ -99,7 +133,7 @@ param_buenos  <- list( objective= "binary",
                        feature_fraction= x$feature_fraction,
                        min_data_in_leaf=  x$min_data_in_leaf,
                        num_leaves= x$num_leaves
-                     )
+)
 
 
 #inicializo donde voy a guardar los resultados
@@ -111,52 +145,62 @@ isemilla  <- 0
 for( semilla in  ksemillas)
 {
   gc()
-
+  
   isemilla  <- isemilla + 1
   cat( isemilla, " " )  #imprimo para saber por que semilla va, ya que es leeentooooo
-
+  
   param_buenos$seed  <- semilla   #aqui utilizo la semilla
   #genero el modelo
   set.seed( semilla )
   modelo  <- lgb.train( data= dtrain,
                         param= param_buenos )
   #agregado para guardar los mejores parametros:
-    #calculo la importancia de variables
+  #calculo la importancia de variables
   tb_importancia  <- lgb.importance( model= modelo )
-
+  tb_importancia[  , pos := .I ]
+  
   #aplico el modelo a los datos nuevos
   prediccion  <- frank(  predict( modelo, 
                                   data.matrix( dfuturo[ , campos_buenos, with=FALSE ]) ) )
-
+  
   tb_predicciones[  , predicciones_acumuladas :=  predicciones_acumuladas +  prediccion ]  #acumulo las predicciones
   tb_predicciones[  , paste0( "pred_", isemilla ) :=  prediccion ]  #guardo el resultado de esta prediccion
-
-
-  if(  isemilla %% 5 == 0 )  #imprimo cada 5 semillas
+  
+  
+  if(  isemilla %% 10 == 0 )  #imprimo cada 10 semillas
   {
     #Genero la entrega para Kaggle
     entrega  <- as.data.table( list( "numero_de_cliente"= dfuturo[  , numero_de_cliente],
                                      "prob"= tb_predicciones$predicciones_acumuladas ) ) #genero la salida
-
+    
     setorder( entrega, -prob )
-
-
-    for(  corte  in seq( 10000, 15000, 1000) ) #imprimo cortes en 10000, 11000, 12000, 13000, 14000 y 15000
+    
+    #genero la salida oficial, sin mesetas
+    entrega[ ,  Predicted := 0L ]
+    cantidad_estimulos  <-  as.integer( nrow(dfuturo)*x$pos_ratio )
+    entrega[ 1:cantidad_estimulos,  Predicted := 1L ]  #me quedo con los primeros
+    
+    #genero el archivo para Kaggle
+    fwrite( entrega[ , c("numero_de_cliente","Predicted"), with=FALSE], 
+            file=  paste0(  kkaggle, isemilla, ".csv" ),  
+            sep= "," )
+    #genero archivo de mejores features:
+    fwrite( tb_importancia, 
+            file= paste0( "./work/E", ksalida, "_", isemilla,"_","mejores", ".txt"),
+            sep="\t" )
+    
+    for(  corte  in seq( 12000, 14000, 500) ) #imprimo cortes en 10000, 11000, 12000, 13000, 14000 y 15000
     {
       entrega[ ,  Predicted := 0L ]
       entrega[ 1:corte,  Predicted := 1L ]  #me quedo con los primeros
-	  #genero archivo de mejores features:
-	  fwrite( tb_importancia, 
-          file= paste0( "./work/E", , ksalida, "_", isemilla,"_","mejores", ".txt"),
-          sep="\t" )
-
+      
+      
       #genero el archivo para Kaggle
       fwrite( entrega[ , c("numero_de_cliente","Predicted"), with=FALSE], 
-              file=  paste0( "./kaggle/" , ksalida, "_", isemilla,"_",corte, ".csv" ),  
+              file=  paste0(  kkagglemeseta, isemilla, "_",corte, ".csv" ),  
               sep= "," )
     }
   }
-
-
+  
+  
 }
-
